@@ -1,0 +1,9 @@
+
+ARGOCD_HOST: "argocd.{server-ip}.sslip.io"  ## argocd server host (default=argocd.127.0.0.1.sslip.io)
+ARGOCD_NEW_PASSWORD: "admin1234" 
+GIT_OPS_URL: "https://github.com/io203/k8s-gitops.git"
+ARGO_APP_NAME: "demp-app"
+REVISION: "main"
+GIT_OPS_PATH: "demo"
+APP_NAMESPACE: "demo"
+DEST_SERVER: "https://kubernetes.default.svc"

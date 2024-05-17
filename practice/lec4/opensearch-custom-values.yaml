@@ -1,0 +1,18 @@
+global:
+  storageClass: "local-path"
+master:
+  # replicaCount: 1 # 추가
+  persistence:
+    size: 4Gi
+data:  
+  # replicaCount: 1 # 추가
+  persistence:
+    size: 4Gi
+dashboards:
+  enabled: true
+
+## 추가
+# coordinating:
+#   replicaCount: 1
+# ingest:
+#   replicaCount: 1  

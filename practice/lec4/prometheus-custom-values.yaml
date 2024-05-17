@@ -1,0 +1,12 @@
+kubeControllerManager:
+  service:
+    enabled: true
+    port: 10250
+    targetPort: 10250
+
+kubeScheduler:  
+  service:
+    enabled: true
+    port: 10250
+    targetPort: 10250
+  

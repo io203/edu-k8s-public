@@ -1,0 +1,52 @@
+daemonset:
+  enabled: true
+
+rbac:
+  create: true
+
+config:
+  service: |
+    [SERVICE]
+        Flush        {{ .Values.config.flush }}
+        Daemon       Off
+        LogLevel     {{ .Values.config.logLevel }}
+        Config_Watch On
+        HTTP_Server  On
+        HTTP_Listen  0.0.0.0
+        HTTP_Port    {{ .Values.containerPorts.http }}
+
+
+  inputs: |
+    [INPUT]
+        Name tail
+        Path /var/log/containers/nginx-deployment-*.log
+        multiline.parser docker, cri
+        Tag kube.*
+        Mem_Buf_Limit 5MB
+
+  filters: |
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Merge_Log On
+        Keep_Log Off
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude On
+
+  outputs: |
+    [OUTPUT]
+        Name  stdout
+        Match *
+
+    [OUTPUT]
+        name               opensearch
+        match              kube.*
+        host               opensearch-ingest-hl.monitoring.svc.cluster.local
+        port               9200
+        tls                Off
+        tls.verify         Off
+        Suppress_Type_Name On
+        Logstash_Format On
+        logstash_prefix_key kubernetes['container_name']
+        logstash_dateformat %Y%m%d
+        Replace_Dots On

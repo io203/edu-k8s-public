@@ -1,0 +1,85 @@
+
+- name: "k8s CD 배포 "
+  hosts: all  ## all, 
+
+  tasks:
+  # - name: "kubectl, kubeconfig 설정"
+  #   shell: |
+  #     mkdir -p ~/.kube/
+  #     cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
+  #     sudo cp /var/lib/rancher/rke2/bin/kubectl /usr/local/bin/
+  #   tags: 
+  #     - kube-pre
+  #     - argocd
+
+  - name: "install 디렉토리 생성"
+    shell: |
+      mkdir -p ./install
+    tags: 
+      - upload
+      - argocd
+
+  - name: files upload   
+    copy:
+      src: "argocd-ing.yaml"
+      dest:  "install/"  
+    tags: 
+      - upload
+      - argocd
+
+  - name: argocd 설치
+    shell: |
+      kubectl create ns argocd
+      kubectl -n argocd apply  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      sleep 20
+      kubectl wait pod --timeout=-1s --for=condition=Ready -l '!job-name' -n argocd  > /dev/null
+    
+    register: output
+    tags: 
+      - argocd
+  - debug:
+      var: output
+    tags: 
+      - argocd
+
+  - name: argocd 설치
+    shell: |
+      kubectl apply -f install/argocd-ing.yaml
+    tags: 
+      - argocd-ing
+      - argocd
+
+  - name: argocd-cli 설치 
+    shell: |
+      sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+      sudo chmod +x /usr/local/bin/argocd
+    tags: 
+      - argocd-cli 
+      - argocd
+  - name: agrocd  change account password
+    shell: |
+      sleep 10
+      PASSWORD="$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo )"
+      argocd login --insecure {{ARGOCD_HOST}}  --username admin  --password $PASSWORD 
+      argocd account update-password --current-password $PASSWORD  --new-password {{ARGOCD_NEW_PASSWORD}}
+    tags: 
+      - arogocd-pwd
+      - argocd
+  
+
+
+  - name: application deploy
+    shell: |
+      argocd app create {{ARGO_APP_NAME}} \
+      --repo {{GIT_OPS_URL}}  \
+      --revision {{REVISION}} \
+      --path {{GIT_OPS_PATH}} \
+      --dest-server {{DEST_SERVER}} \
+      --dest-namespace {{APP_NAMESPACE}} \
+      --sync-policy automated \
+      --sync-option CreateNamespace=true \
+      --upsert
+
+      argocd app sync {{ARGO_APP_NAME}}
+    tags: 
+      - app-deploy
