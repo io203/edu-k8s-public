@@ -138,9 +138,10 @@ helm uninstall prometheus -n monitoring
 # 2. opensearch
 
 ## 2.1 worker 3개 필요 
-- opensearch 설치 하기 위해서 최소한 worker가 3개 필요하다 
+- 운영에서 opensearch 설치 하기 위해서 최소한 worker가 3개 필요하다 
 - worker를 하나 만들고 lec0에서 했던 agent를 추가 한다 
-
+- 본 예제는 pod 수를 줄여서 worker갯수가 2개에서 가능하도록 하였다
+- 
 ## 2.2 opensearch는 pv가 필요하며  pv 때문에 설치(Rancher Local Path Provisioner)
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml

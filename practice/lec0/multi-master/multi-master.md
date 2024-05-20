@@ -18,7 +18,7 @@ cd practice/lec0/multi-master
 ## root로 로그인
 sudu su -
 
-git clone https://github.com/io203/edu-k8s-internal.git
+git clone https://github.com/io203/edu-k8s-public.git
 
 
 
@@ -64,7 +64,7 @@ K1036e5d23529ef532f73a7e02d8f2a0d5fe34853b045d81943545f8880929fa553::server:f6b5
 ## root로 로그인 
 sudo su -
 
-git clone https://github.com/io203/edu-k8s-internal.git
+git clone https://github.com/io203/edu-k8s-public.git
 
 
 export EXTERNAL_IP=52.78.102.99
